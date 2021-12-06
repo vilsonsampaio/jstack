@@ -1,13 +1,29 @@
 // Importing http module to creates an simple api
 const http = require('http');
 
+// Importing users
+const users = require('./mocks/users');
+
 // Creating an http server and storing it in server const
 const server = http.createServer((request, response) => {
-  // Setting response's header, informing the status code and the content type 
-  response.writeHead(200, { 'Content-Type': 'text/html' });
+  // Printing the request method and the endpoint accessed by user.
+  console.log(`Request method: ${request.method} | Endpoint: ${request.url}`);
 
-  // Sending the server response that, in this case, prints an h1 element
-  response.end('<h1>Hello World!</h1>');
+  // If user wants to get the users' info list
+  if (request.url === '/users' && request.method === 'GET') {
+    // Changing Content-Type 'cause now response is returning an JSON.
+    response.writeHead(200, { 'Content-Type': 'application/json' });
+
+    // Converting the users mock, cause response.end only receive an String.
+    response.end(JSON.stringify(users));
+  } else {
+    // In case that users don't access the /users endpoint with GET method, 
+    // return a 404 status code (not found). 
+    response.writeHead(404, { 'Content-Type': 'text/html' });
+  
+    // Print an message informing that can't access endpoint or use method
+    response.end(`Cannot ${request.method} ${request.url}`);
+  }
 });
 
 // Setting an port to the created server listen/up in machine. 
