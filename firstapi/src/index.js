@@ -1,27 +1,33 @@
 // Importing http module to creates an simple api
 const http = require('http');
 
-// Importing users
-const users = require('./mocks/users');
+// Importing routes conditions
+const routes = require('./routes');
 
 // Creating an http server and storing it in server const
 const server = http.createServer((request, response) => {
-  // Printing the request method and the endpoint accessed by user.
+
+  // Printing the request method and the endpoint accessed by the user.
   console.log(`Request method: ${request.method} | Endpoint: ${request.url}`);
 
-  // If user wants to get the users' info list
-  if (request.url === '/users' && request.method === 'GET') {
-    // Changing Content-Type 'cause now response is returning an JSON.
-    response.writeHead(200, { 'Content-Type': 'application/json' });
+  // Function that will iterate all the routes and if it finds one that matches
+  // the endpoint and method accessed by the user, will return its infos.
+  // If doesn't match, will return undefined.
+  const route = routes.find(routeObj => (
+    routeObj.endpoint === request.url && routeObj.method === request.method
+  ));
 
-    // Converting the users mock, cause response.end only receive an String.
-    response.end(JSON.stringify(users));
+  // If the route accessed by the user was found, execute its handler.
+  if (route) {
+    // Executing the respective handler, passing the request and the response 
+    // as parameters.
+    route.handler(request, response);
   } else {
-    // In case that users don't access the /users endpoint with GET method, 
+    // In case the chosen route doesn't match with any endpoints and methods, 
     // return a 404 status code (not found). 
     response.writeHead(404, { 'Content-Type': 'text/html' });
   
-    // Print an message informing that can't access endpoint or use method
+    // Printing an message informing that can't access endpoint or use method
     response.end(`Cannot ${request.method} ${request.url}`);
   }
 });
