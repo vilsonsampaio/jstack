@@ -1,24 +1,35 @@
 // Importing http module to creates an simple api
 const http = require('http');
 
+// Importing the URL class constructor to make it easier to work with URLs
+const { URL } = require('url');
+
 // Importing routes conditions
 const routes = require('./routes');
 
 // Creating an http server and storing it in server const
 const server = http.createServer((request, response) => {
+  // Creating an instance of URL class, to work better with Query Params.
+  const parsedUrl = new URL(`http://localhost:3000${request.url}`);
 
   // Printing the request method and the endpoint accessed by the user.
-  console.log(`Request method: ${request.method} | Endpoint: ${request.url}`);
+  console.log(`Request method: ${request.method} | Endpoint: ${parsedUrl.pathname}`);
 
   // Function that will iterate all the routes and if it finds one that matches
   // the endpoint and method accessed by the user, will return its infos.
   // If doesn't match, will return undefined.
   const route = routes.find(routeObj => (
-    routeObj.endpoint === request.url && routeObj.method === request.method
+    routeObj.endpoint === parsedUrl.pathname && routeObj.method === request.method
   ));
 
   // If the route accessed by the user was found, execute its handler.
   if (route) {
+    // Creating a property in request that will storing all the Query Params 
+    // listed in searchParams property. This property returns an iterable with
+    // all the params informed by user. To make the job easier, we can convert
+    // this type of data to an object, through the function Object.fromEntries().
+    request.query = Object.fromEntries(parsedUrl.searchParams);
+
     // Executing the respective handler, passing the request and the response 
     // as parameters.
     route.handler(request, response);
@@ -28,7 +39,7 @@ const server = http.createServer((request, response) => {
     response.writeHead(404, { 'Content-Type': 'text/html' });
   
     // Printing an message informing that can't access endpoint or use method
-    response.end(`Cannot ${request.method} ${request.url}`);
+    response.end(`Cannot ${request.method} ${parsedUrl.pathname}`);
   }
 });
 
