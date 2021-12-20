@@ -25,4 +25,28 @@ module.exports = {
     // Converting the users mock, cause response.end only receive an String.
     response.end(JSON.stringify(sortedUsers));
   },
+
+  // Method that will be executed when the endpoint /users/:id is accessed with the GET method.
+  getUserById(request, response) {
+    // Getting user id sending in params
+    const { id } = request.params;
+
+    // Finding the user with the requested id
+    const user = users.find(user => user.id === Number(id));
+
+    // If there isn't a user with requested id, return an error message. 
+    if (!user) {
+      // Setting status code in 400 (bad request) and reporting the content type.
+      response.writeHead(400, { 'Content-Type': 'application/json' });
+
+      // Sending error message
+      response.end(JSON.stringify({ error: 'User not found'}));
+    } else {
+      // Setting status code in 200 and reporting the content type.
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+  
+      // Sending the found user
+      response.end(JSON.stringify(user));
+    }
+  },
 };

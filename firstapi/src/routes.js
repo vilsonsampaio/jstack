@@ -8,4 +8,11 @@ module.exports = [
     method: 'GET',
     handler: UserController.listUsers,
   },
+
+  // Conditions to show the user with an specific id
+  {
+    endpoint: '/users/:id',
+    method: 'GET',
+    handler: UserController.getUserById,
+  },
 ];

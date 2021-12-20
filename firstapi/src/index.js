@@ -15,11 +15,28 @@ const server = http.createServer((request, response) => {
   // Printing the request method and the endpoint accessed by the user.
   console.log(`Request method: ${request.method} | Endpoint: ${parsedUrl.pathname}`);
 
-  // Function that will iterate all the routes and if it finds one that matches
-  // the endpoint and method accessed by the user, will return its infos.
+  // Destructuring parsedUrl in a let, because it will be overwrite later.
+  let { pathname } = parsedUrl;
+  let id = null;
+
+  // Splitting the endpoint, separating it by bars
+  // The .filter() function will iterate the array, removing falsy values.
+  // .filter((routeItem) => Boolean(routeItem)) == .filter(Boolean)
+  const splitEndpoint = pathname.split('/').filter(Boolean);
+
+  // If have more than one element in splitted endpoint, i.e., is receiving
+  // a parameter, overwrite pathname to .find function below works and store
+  // id value from parameter.
+  if (splitEndpoint.length > 1) {
+    pathname = `/${splitEndpoint[0]}/:id`;
+    id = splitEndpoint[1];
+  }
+
+  // The function .find() will iterate all the routes and if finds one that 
+  // matches the endpoint and method accessed by the user, will return its infos.
   // If doesn't match, will return undefined.
   const route = routes.find(routeObj => (
-    routeObj.endpoint === parsedUrl.pathname && routeObj.method === request.method
+    routeObj.endpoint === pathname && routeObj.method === request.method
   ));
 
   // If the route accessed by the user was found, execute its handler.
@@ -29,6 +46,9 @@ const server = http.createServer((request, response) => {
     // all the params informed by user. To make the job easier, we can convert
     // this type of data to an object, through the function Object.fromEntries().
     request.query = Object.fromEntries(parsedUrl.searchParams);
+
+    // Creating an object in request that will inject the id
+    request.params = { id };
 
     // Executing the respective handler, passing the request and the response 
     // as parameters.
