@@ -4,6 +4,9 @@ const http = require('http');
 // Importing the URL class constructor to make it easier to work with URLs
 const { URL } = require('url');
 
+// Importing bodyParser helper
+const bodyParser = require('./helpers/bodyParser');
+
 // Importing routes conditions
 const routes = require('./routes');
 
@@ -58,9 +61,13 @@ const server = http.createServer((request, response) => {
       response.end(JSON.stringify(body));
     }
 
-    // Executing the respective handler, passing the request and the response 
-    // as parameters.
-    route.handler(request, response);
+    if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
+      bodyParser(request, () => route.handler(request, response));
+    } else {
+      // Executing the respective handler, passing the request and the response 
+      // as parameters.
+      route.handler(request, response);
+    }
   } else {
     // In case the chosen route doesn't match with any endpoints and methods, 
     // return a 404 status code (not found). 
