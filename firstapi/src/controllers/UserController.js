@@ -41,4 +41,46 @@ module.exports = {
     // stop the code if it enters the above condition.
     response.send(200, user);
   },
+  
+  // Method that will be executed when the endpoint /users is accessed with the POST method.
+  createUser(request, response) {
+    // The information in the body of the requests is sent by streams, i.e., 
+    // it's sent bit by bit. For this reason, it's need to create an Event Listener,
+    // which will listen every time those infos arrives, concatenate all data,
+    // and then parses it into JSON.
+    let body = '';
+
+    // Creating an Event Listener in request that watches every time an data come
+    // and stores its value in the chunk arg receive in the callback function.
+    request.on('data', (chunk) => {
+      // Concatenating in body all the data that arrived in chunk arg
+      body += chunk;
+    });
+
+    // Creating an Event Listener in request that watches when data stops to 
+    // coming in.
+    request.on('end', () => {
+      // Since the response.send method receives an object as argument and then
+      // transforms it into a JSON string, it's necessary to convert the body, 
+      // which comes as string, into an object.
+      body = JSON.parse(body);
+
+      // Getting the Id of the last user.
+      const lastUserId = users[users.length - 1].id;
+
+      // Creating a new user, incrementing 1 in the last user's id and setting
+      // the name that comes from the body
+      const newUser = {
+        id: lastUserId + 1,
+        name: body.name,
+      };
+
+      // Insert the new user in the users array
+      users.push(newUser);
+
+      // Sending to client 201 status code (create) and the new user.
+      response.send(201, newUser);
+    });
+
+  },
 };

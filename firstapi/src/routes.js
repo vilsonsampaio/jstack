@@ -15,4 +15,11 @@ module.exports = [
     method: 'GET',
     handler: UserController.getUserById,
   },
+
+  // Conditions to insert an user
+  {
+    endpoint: '/users',
+    method: 'POST',
+    handler: UserController.createUser,
+  },
 ];
