@@ -50,6 +50,14 @@ const server = http.createServer((request, response) => {
     // Creating an object in request that will inject the id
     request.params = { id };
 
+    // Injecting a property on response, to encapsulate a response.send method,
+    // which includes the response.writeHead and response.end methods, receiving
+    // the status code and the response body in parameters.
+    response.send = (statusCode, body) => {
+      response.writeHead(statusCode, { 'Content-Type': 'text/html' });
+      response.end(JSON.stringify(body));
+    }
+
     // Executing the respective handler, passing the request and the response 
     // as parameters.
     route.handler(request, response);

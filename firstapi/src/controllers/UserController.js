@@ -19,11 +19,8 @@ module.exports = {
       return a.id > b.id ? 1 : -1;
     });
 
-    // Changing Content-Type 'cause now response is returning an JSON.
-    response.writeHead(200, { 'Content-Type': 'application/json' });
-
-    // Converting the users mock, cause response.end only receive an String.
-    response.end(JSON.stringify(sortedUsers));
+    // Sending to client 200 status code and the list of sorted users.
+    response.send(200, sortedUsers);
   },
 
   // Method that will be executed when the endpoint /users/:id is accessed with the GET method.
@@ -36,17 +33,12 @@ module.exports = {
 
     // If there isn't a user with requested id, return an error message. 
     if (!user) {
-      // Setting status code in 400 (bad request) and reporting the content type.
-      response.writeHead(400, { 'Content-Type': 'application/json' });
-
-      // Sending error message
-      response.end(JSON.stringify({ error: 'User not found'}));
-    } else {
-      // Setting status code in 200 and reporting the content type.
-      response.writeHead(200, { 'Content-Type': 'application/json' });
-  
-      // Sending the found user
-      response.end(JSON.stringify(user));
-    }
+      // Sending 400 status code and an error message
+      return response.send(400, { error: 'User not found' });
+    } 
+    
+    // Else was removed to refactor the code, by using a return in the If, to 
+    // stop the code if it enters the above condition.
+    response.send(200, user);
   },
 };
