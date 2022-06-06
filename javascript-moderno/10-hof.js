@@ -23,3 +23,9 @@ const productsWithSubtotal = products.map(product => ({
 
 // .filter
 const productsWithQuantityMoreThan1 = products.filter(product => product.quantity < 1);
+
+
+// .filter
+const productsTotal = products.reduce((acc, cur) => {
+  return acc + (cur.quantity * cur.price);
+}, 0);
