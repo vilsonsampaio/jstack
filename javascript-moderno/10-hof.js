@@ -12,3 +12,10 @@ const iPhonePosition = products.findIndex(product => product.name === 'iPhone');
 // .some e .every
 const isSomeProductBelow1000 = products.some(product => product.price < 1000);
 const isEveryProductsOver1000 = products.every(product => product.price > 1000);
+
+
+// .map
+const productsWithSubtotal = products.map(product => ({
+  ...product,
+  subtotal: product.quantity * product.price
+}));
